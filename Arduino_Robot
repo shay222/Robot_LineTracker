@@ -1,10 +1,56 @@
-#define MOTOR_PIN 5
+//including motorshield library
+#include <Adafruit_MotorShield.h>
+
+//Defining motor pins
+#define POS_POLARITY_MOTOR_PIN 1
+#define NEG_POLARITY_MOTOR_PIN 4
+
+//Instantiating the motorshield
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); //default board constructor
+
+//Accessing the motors from the motorshield
+Adafruit_DCMotor *POS_MOTOR = AFMS.getMotor(POS_POLARITY_MOTOR_PIN);
+Adafruit_DCMotor *NEG_MOTOR = AFMS.getMotor(NEG_POLARITY_MOTOR_PIN);
+
 void setup() {
   // put your setup code here, to run once:
+  AFMS.begin();
+  POS_MOTOR->setSpeed(0);
+  POS_MOTOR->run(RELEASE);
+
+  NEG_MOTOR->setSpeed(0);
+  NEG_MOTOR->run(RELEASE);
 
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
+
+//speed up and slow down the wheels
+ 
+    if(i==0){
+    while(i<250)
+    {
+      i+=25;
+      POS_MOTOR->setSpeed(i);
+      NEG_MOTOR->setSpeed(i);
+      POS_MOTOR->run(FORWARD);
+      NEG_MOTOR->run(FORWARD);
+      delay(300);
+
+    }
+  }
+
+  if(i==250){
+    while(i>0){
+      i-=25;
+      POS_MOTOR->setSpeed(i);
+      NEG_MOTOR->setSpeed(i);
+      POS_MOTOR->run(BACKWARD);
+      NEG_MOTOR->run(BACKWARD);
+      delay(300);
+    }
+  }
+
 
 }
