@@ -1,0 +1,323 @@
+#include <Adafruit_MotorShield.h>
+#include <hp_BH1750.h>
+
+hp_BH1750 lightSensor; //lux sensor
+
+//Defining motor pins
+#define POS_MOTOR_RF 3 //right front 
+#define NEG_MOTOR_LF 4 //left front 
+
+#define POS_MOTOR_RB 2 //right back 
+#define NEG_MOTOR_LB 1 //left back
+
+//Instantiating the motorshield
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); //default board constructor
+
+//Accessing the motors from the motorshield
+Adafruit_DCMotor *POS_RF = AFMS.getMotor(POS_MOTOR_RF);
+Adafruit_DCMotor *NEG_LF = AFMS.getMotor(NEG_MOTOR_LF);
+
+Adafruit_DCMotor *POS_RB = AFMS.getMotor(POS_MOTOR_RB);
+Adafruit_DCMotor *NEG_LB = AFMS.getMotor(NEG_MOTOR_LB);
+
+//defining IR pins 
+#define IR_PRF 5 //right front - black
+#define IR_PLF 6 //left front - black 
+#define IR_PB 9 // back - black - SET
+
+
+int lightWent = 1;
+
+
+void setup() {
+  
+  lightSensor.begin(BH1750_TO_GROUND); 
+
+  AFMS.begin();
+  POS_RF->setSpeed(0);
+  POS_RF->run(RELEASE);
+
+  NEG_LF->setSpeed(0);
+  NEG_LF->run(RELEASE);
+
+  POS_RB->setSpeed(0);
+  POS_RB->run(RELEASE);
+
+  NEG_LB->setSpeed(0);
+  NEG_LB->run(RELEASE);
+
+
+  //setting up IR sensors
+  pinMode(IR_PRF,INPUT);
+  pinMode(IR_PLF,INPUT);
+  pinMode(IR_PB, INPUT);
+
+
+
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  //lightSensor.start();
+  //int lux = lightSensor.getLux();
+
+
+
+  /*if (lux >= 1000){
+    lightWent = 1;
+  }*/
+
+  int lux;
+
+  while (lightWent == 1){ 
+
+    lightSensor.start();
+    lux = lightSensor.getLux();
+    //delay(100);
+    if (lux > 1000) {
+      lightWent = 0;
+      break;
+    }
+    //Serial.print("Lux:");
+    //Serial.println(lux);
+    //Serial.print("small loop");
+    //Serial.println(lightWent);
+
+  }
+
+  
+
+
+  lightWent = 0;
+  
+  Serial.print("big loop");
+  Serial.println(lightWent);
+
+ // Serial.print("Lux:");
+ // Serial.println(lux);
+
+/*
+  Serial.print("RF: ");
+  Serial.println(IRrf);
+  Serial.print("LF: ");
+  Serial.println(IRlf);
+  Serial.print("RB: ");
+  Serial.println(IRb);
+  delay(500);*/
+ 
+  int IRrf, IRlf, IRb;
+
+
+
+
+  //Four IR sensors - 2 in front (left and right) check for white to steer, front middle checks for black to go straight
+
+    IRrf = digitalRead(IR_PRF);
+    IRlf = digitalRead(IR_PLF);
+    IRb = digitalRead(IR_PB);   
+
+    if((IRrf == 0) && (IRlf == 0) && (IRb == 1) ){ //changed
+      //go straight  
+      //all four wheels go 
+
+      POS_RF->setSpeed(200);
+      NEG_LF->setSpeed(200);
+      POS_RF->run(FORWARD);
+      NEG_LF->run(FORWARD);
+
+      POS_RB->setSpeed(200);
+      NEG_LB->setSpeed(200);
+      POS_RB->run(FORWARD);
+      NEG_LB->run(FORWARD);
+
+/*
+      delay(30);
+
+      IRrf = digitalRead(IR_PRF);
+      IRlf = digitalRead(IR_PLF);
+      IRb = digitalRead(IR_PB);
+  */    
+      
+    }
+
+/*
+      POS_RF->setSpeed(0);
+      POS_RF->run(RELEASE);
+
+      NEG_LF->setSpeed(0);
+      NEG_LF->run(RELEASE);
+
+      POS_RB->setSpeed(0);
+      POS_RB->run(RELEASE);
+
+      NEG_LB->setSpeed(0);
+      NEG_LB->run(RELEASE);
+      
+      */
+     //end of go straight loop
+
+
+
+  //right turn 
+    //Left front detects white, right front detects black
+    //3 wheels stop except for left front wheel 
+      //until back detects black and front 2 detect black again 
+
+
+
+    if ((IRrf == 0) && (IRlf == 1)){ //&&(IRb == 1) ){ //changed
+
+      POS_RF->setSpeed(0);
+      NEG_LF->setSpeed(150);
+      POS_RF->run(RELEASE);
+      NEG_LF->run(FORWARD);
+
+      POS_RB->setSpeed(40);
+      NEG_LB->setSpeed(100);
+      POS_RB->run(BACKWARD);
+      NEG_LB->run(FORWARD);
+
+/*
+      delay(30);
+
+      IRrf = digitalRead(IR_PRF);
+      //delay(1);
+      IRlf = digitalRead(IR_PLF);
+      //delay(1);
+      IRb = digitalRead(IR_PB);
+      //delay(1);
+      */
+
+    } //end of right turn loop
+/*
+      POS_RF->setSpeed(0);
+      POS_RF->run(RELEASE);
+
+      NEG_LF->setSpeed(0);
+      NEG_LF->run(RELEASE);
+
+      POS_RB->setSpeed(0);
+      POS_RB->run(RELEASE);
+
+      NEG_LB->setSpeed(0);
+      NEG_LB->run(RELEASE);
+      */
+
+  //left turn 
+    //Left front detects black, right front detects white - 1 in back detects black 
+    //3 wheels stop except for left front wheel 
+      
+    if((IRrf == 1) && (IRlf == 0)){// && (IRb == 1) ){ // changed
+
+      POS_RF->setSpeed(150);
+      NEG_LF->setSpeed(0);
+      POS_RF->run(FORWARD);
+      NEG_LF->run(RELEASE);
+
+      POS_RB->setSpeed(100);
+      NEG_LB->setSpeed(40);
+      POS_RB->run(FORWARD);
+      NEG_LB->run(BACKWARD);
+/*
+      delay(30);
+
+      IRrf = digitalRead(IR_PRF);
+      //delay(1);
+      IRlf = digitalRead(IR_PLF);
+      //delay(1);
+      IRb = digitalRead(IR_PB);
+      //delay(1);
+      */
+
+    }
+     /* 
+      POS_RF->setSpeed(0);
+      POS_RF->run(RELEASE);
+
+      NEG_LF->setSpeed(0);
+      NEG_LF->run(RELEASE);
+
+      POS_RB->setSpeed(0);
+      POS_RB->run(RELEASE);
+
+      NEG_LB->setSpeed(0);
+      NEG_LB->run(RELEASE);
+     //end of left turn loop
+*/
+    
+
+  //off track 
+    //back IR pin detects white 
+      // reverse until CONDITION
+  
+  
+  
+    if( IRb == 0 && IRrf == 0 && IRlf == 0 ) {
+
+      POS_RF->setSpeed(50);
+      NEG_LF->setSpeed(50);
+      POS_RF->run(BACKWARD);
+      NEG_LF->run(BACKWARD);
+
+      POS_RB->setSpeed(50);
+      NEG_LB->setSpeed(50);
+      POS_RB->run(BACKWARD);
+      NEG_LB->run(BACKWARD);
+
+/*
+      delay(30);
+      
+      IRrf = digitalRead(IR_PRF);
+      IRlf = digitalRead(IR_PLF);
+      IRb = digitalRead(IR_PB);
+      */
+
+    } //end of reverse loop
+
+/*
+      POS_RF->setSpeed(0);
+      NEG_LF->setSpeed(0);
+      POS_RF->run(RELEASE);
+      NEG_LF->run(RELEASE);
+
+      POS_RB->setSpeed(0);
+      NEG_LB->setSpeed(0);
+      POS_RB->run(RELEASE);
+      NEG_LB->run(RELEASE);
+ */ 
+
+    
+
+  //End of race 
+    //Two in front detect black and one in back detects black 
+      //stop all four wheels  
+
+    if(IRrf == 1 && IRlf == 1 && IRb == 1){
+      POS_RF->setSpeed(0);
+      NEG_LF->setSpeed(0);
+      POS_RF->run(RELEASE);
+      NEG_LF->run(RELEASE);
+
+      POS_RB->setSpeed(0);
+      NEG_LB->setSpeed(0);
+      POS_RB->run(RELEASE);
+      NEG_LB->run(RELEASE);
+
+      //lightWent = 1;
+/*
+      IRrf = digitalRead(IR_PRF);
+      //delay(1);
+      IRlf = digitalRead(IR_PLF);
+      //delay(1);
+      IRb = digitalRead(IR_PB);
+      //delay(1);
+      */
+
+    } // end of race 
+
+
+   
+
+  //lightWent = 0;
+
+}
