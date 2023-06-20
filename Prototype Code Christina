@@ -1,0 +1,246 @@
+//DECLARATIONS AND DEFINITIONS
+#include <Adafruit_MotorShield.h>
+#include <hp_BH1750.h>
+
+hp_BH1750 lightSensor; //lux sensor
+
+//Defining motor pins
+#define POS_MOTOR_RF 3 //right front 
+#define NEG_MOTOR_LF 4 //left front 
+
+#define POS_MOTOR_RB 2 //right back 
+#define NEG_MOTOR_LB 1 //left back
+
+//Instantiating the motorshield
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); //default board constructor
+
+//Accessing the motors from the motorshield
+Adafruit_DCMotor *RF_MOTOR = AFMS.getMotor(POS_MOTOR_RF);
+Adafruit_DCMotor *LF_MOTOR = AFMS.getMotor(NEG_MOTOR_LF);
+
+Adafruit_DCMotor *RB_MOTOR = AFMS.getMotor(POS_MOTOR_RB);
+Adafruit_DCMotor *LB_MOTOR = AFMS.getMotor(NEG_MOTOR_LB);
+
+//defining IR pins 
+#define IR_PRF 5 //right front - black
+#define IR_PLF 6 //left front - black 
+#define IR_PRB 9 // IRrb
+#define IR_PLB 10 // check to make sure this is a valid pin for IRlb
+
+
+
+//GLOBAL VARIABLE
+int lightWent = 1;
+
+void turnRight(){
+
+  RF_MOTOR->setSpeed(0);
+  LF_MOTOR->setSpeed(200);
+  RF_MOTOR->run(RELEASE);
+  LF_MOTOR->run(FORWARD);
+
+  RB_MOTOR->setSpeed(50);
+  LB_MOTOR->setSpeed(100);
+  RB_MOTOR->run(BACKWARD);
+  LB_MOTOR->run(FORWARD);
+
+}
+
+
+//FUNCTIONS
+void turnLeft(){
+
+  RF_MOTOR->setSpeed(200);
+  LF_MOTOR->setSpeed(0);
+  RF_MOTOR->run(FORWARD);
+  LF_MOTOR->run(RELEASE);
+
+  RB_MOTOR->setSpeed(100);
+  LB_MOTOR->setSpeed(50);
+  RB_MOTOR->run(FORWARD);
+  LB_MOTOR->run(BACKWARD);
+
+}
+
+void straight(){
+
+  RF_MOTOR->setSpeed(230);
+  LF_MOTOR->setSpeed(230);
+  RF_MOTOR->run(FORWARD);
+  LF_MOTOR->run(FORWARD);
+
+  RB_MOTOR->setSpeed(230);
+  LB_MOTOR->setSpeed(230);
+  RB_MOTOR->run(FORWARD);
+  LB_MOTOR->run(FORWARD);
+
+}
+
+void stop(){
+
+  RF_MOTOR->setSpeed(0);
+  LF_MOTOR->setSpeed(0);
+  RF_MOTOR->run(RELEASE);
+  LF_MOTOR->run(RELEASE);
+
+  RB_MOTOR->setSpeed(0);
+  LB_MOTOR->setSpeed(0);
+  RB_MOTOR->run(RELEASE);
+  LB_MOTOR->run(RELEASE);
+
+}
+
+void reverse(){
+
+  RF_MOTOR->setSpeed(30);
+  LF_MOTOR->setSpeed(30);
+  RF_MOTOR->run(BACKWARD);
+  LF_MOTOR->run(BACKWARD);
+
+  RB_MOTOR->setSpeed(30);
+  LB_MOTOR->setSpeed(30);
+  RB_MOTOR->run(BACKWARD);
+  LB_MOTOR->run(BACKWARD);
+}
+
+
+
+//SET UP CODE - Runs once 
+void setup() {
+
+  lightSensor.begin(BH1750_TO_GROUND); 
+
+  AFMS.begin();
+  RF_MOTOR->setSpeed(0);
+  RF_MOTOR->run(RELEASE);
+
+  LF_MOTOR->setSpeed(0);
+  LF_MOTOR->run(RELEASE);
+
+  RB_MOTOR->setSpeed(0);
+  RB_MOTOR->run(RELEASE);
+
+  LB_MOTOR->setSpeed(0);
+  LB_MOTOR->run(RELEASE);
+
+
+  //setting up IR sensors
+  pinMode(IR_PRF,INPUT);
+  pinMode(IR_PLF,INPUT);
+  pinMode(IR_PRB, INPUT);
+  pinMode(IR_PLB, INPUT);
+
+
+}
+
+
+
+//START OF LOOPING CODE
+void loop() {
+  // put your main code here, to run repeatedly:
+
+  //declaring and initializing IR sensors
+    int IRrf = digitalRead(IR_PRF);
+    int IRlf = digitalRead(IR_PLF);
+    int IRrb = digitalRead(IR_PRB);   
+    int IRlb = digitalRead(IR_PLB);
+
+
+
+  //lightSensor.start();
+  //int lux = lightSensor.getLux();
+
+  //start light flash
+  int lux;
+
+  while (lightWent == 1){ 
+    lightSensor.start();
+    lux = lightSensor.getLux();
+    //delay(100);
+    if (lux > 1000) {
+      lightWent = 0;
+      break;
+    }
+    //Serial.print("Lux:");
+    //Serial.println(lux);
+    //Serial.print("small loop");
+    //Serial.println(lightWent);
+
+  }
+
+
+  lightWent = 0;
+
+  Serial.print("big loop");
+  Serial.println(lightWent);
+
+ // Serial.print("Lux:");
+ // Serial.println(lux);
+
+/*
+  Serial.print("RF: ");
+  Serial.println(IRrf);
+  Serial.print("LF: ");
+  Serial.println(IRlf);
+  Serial.print("RB: ");
+  Serial.println(IRrb);
+  delay(500);*/
+
+    
+
+
+    //conditions for right turn
+    if(IRrf == 1 && IRlf == 0) ){ //posibly come bck to optimize
+
+      turnRight();
+    
+    }
+    //conditions for left turn
+    else if((IRlf == 1 && IRrf == 0) || (IRlb == 1 && IRrb == 0)){
+
+      turnLeft();
+
+    }
+    //conditions for logo/capacitor
+    else if(IRrf == 1 && IRlf == 1 && IRrb == 1 && IRlb == 1){ 
+
+      straight();
+
+    } 
+    //conditions for capacitor
+    else if (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) {
+      straight();
+
+        //Cases included
+          //
+
+    }
+
+        //conditions for going straight
+    else if(IRrf == 0 && IRlf == 0 && IRrb == 1 && IRlb == 1){
+      while(IRrf == 0 && IRlf == 0 && IRrb == 1 && IRlb == 1){// || (IRrf == 0 && IRlb == 0) || (IRlf == 0 && IRrb == 0) ) { || (IRlf == 0 && IRrb == 0) ){ 
+
+        straight();
+
+        IRrf = digitalRead(IR_PRF);
+        IRlf = digitalRead(IR_PLF);
+        IRrb = digitalRead(IR_PRB);   
+        IRlb = digitalRead(IR_PLB);
+      }
+
+      stop();
+    }
+
+    //end conditions 
+    lightSensor.start();
+    lux = lightSensor.getLux();
+
+    if (lux > 1000) {
+      lightWent = 1;
+    }
+
+    delay(30);
+
+  }
+
+
