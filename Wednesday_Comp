@@ -30,11 +30,15 @@ Adafruit_DCMotor *LB_MOTOR = AFMS.getMotor(NEG_MOTOR_LB);
 
 
 int lightWent = 1;
+int counter = 0;
 
-void turnRight(){
+
+
+//FUNCTIONS
+void bigRight(){
 
   RF_MOTOR->setSpeed(0);
-  LF_MOTOR->setSpeed(200);
+  LF_MOTOR->setSpeed(255);
   RF_MOTOR->run(RELEASE);
   LF_MOTOR->run(FORWARD);
 
@@ -45,24 +49,78 @@ void turnRight(){
 
 }
 
-void turnLeft(){
+void mediumRight(){
 
-  RF_MOTOR->setSpeed(200);
+  RF_MOTOR->setSpeed(0);
+  LF_MOTOR->setSpeed(220);
+  RF_MOTOR->run(RELEASE);
+  LF_MOTOR->run(FORWARD);
+
+  RB_MOTOR->setSpeed(40);
+  LB_MOTOR->setSpeed(180);
+  RB_MOTOR->run(BACKWARD);
+  LB_MOTOR->run(FORWARD);
+
+
+}
+
+void littleRight(){
+
+  RF_MOTOR->setSpeed(0);
+  LF_MOTOR->setSpeed(200);
+  RF_MOTOR->run(RELEASE);
+  LF_MOTOR->run(FORWARD);
+
+  RB_MOTOR->setSpeed(10);
+  LB_MOTOR->setSpeed(200);
+  RB_MOTOR->run(BACKWARD);
+  LB_MOTOR->run(FORWARD);
+
+
+}
+
+void bigLeft(){
+
+  RF_MOTOR->setSpeed(255);
   LF_MOTOR->setSpeed(0);
   RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(RELEASE);
 
-  RB_MOTOR->setSpeed(100);
-  LB_MOTOR->setSpeed(50);
+  RB_MOTOR->setSpeed(50);
+  LB_MOTOR->setSpeed(100);
   RB_MOTOR->run(FORWARD);
   LB_MOTOR->run(BACKWARD);
 
 }
 
+void mediumLeft(){
+  RF_MOTOR->setSpeed(220);
+  LF_MOTOR->setSpeed(0);
+  RF_MOTOR->run(FORWARD);
+  LF_MOTOR->run(RELEASE);
+
+  RB_MOTOR->setSpeed(180);
+  LB_MOTOR->setSpeed(40);
+  RB_MOTOR->run(FORWARD);
+  LB_MOTOR->run(BACKWARD);
+}
+
+void littleLeft(){
+  RF_MOTOR->setSpeed(200);
+  LF_MOTOR->setSpeed(0);
+  RF_MOTOR->run(FORWARD);
+  LF_MOTOR->run(RELEASE);
+
+  RB_MOTOR->setSpeed(200);
+  LB_MOTOR->setSpeed(10);
+  RB_MOTOR->run(FORWARD);
+  LB_MOTOR->run(BACKWARD);
+}
+
 void straight(){
 
-  RF_MOTOR->setSpeed(230);
-  LF_MOTOR->setSpeed(230);
+  RF_MOTOR->setSpeed(200);
+  LF_MOTOR->setSpeed(200);
   RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(FORWARD);
 
@@ -89,13 +147,13 @@ void stop(){
 
 void reverse(){
 
-  RF_MOTOR->setSpeed(30);
-  LF_MOTOR->setSpeed(30);
+  RF_MOTOR->setSpeed(120);
+  LF_MOTOR->setSpeed(120);
   RF_MOTOR->run(BACKWARD);
   LF_MOTOR->run(BACKWARD);
 
-  RB_MOTOR->setSpeed(30);
-  LB_MOTOR->setSpeed(30);
+  RB_MOTOR->setSpeed(120);
+  LB_MOTOR->setSpeed(120);
   RB_MOTOR->run(BACKWARD);
   LB_MOTOR->run(BACKWARD);
 }
@@ -138,11 +196,13 @@ void loop() {
 
     lightSensor.start();
     lux = lightSensor.getLux();
-    //delay(100);
     if (lux > 1000) {
       lightWent = 0;
       break;
     }
+  }
+
+    /*
     //Serial.print("Lux:");
     //Serial.println(lux);
     //Serial.print("small loop");
@@ -150,7 +210,7 @@ void loop() {
 
   }
 
-  
+  */
 
 
   lightWent = 0;
@@ -178,32 +238,6 @@ void loop() {
     int IRlb = digitalRead(IR_PLB);
 
 
-
-    //conditions for right turn
-    if((IRrf == 1) || (IRrf == 1 && IRrb == 1) ){ //posibly come bck to optimize
-
-      turnRight();
-
-    }
-    //conditions for left turn
-    else if((IRlf == 1 && IRrf == 0) || (IRlb == 1 && IRrb == 0)){
-
-      turnLeft();
-    }
-    //conditions for end of race
-    else if(IRrf == 1 && IRlf == 1){ //|| (IRrb == 1 && IRlb == 1)){
-
-      stop();
-
-    } 
-    else if (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) { //in any other case reverse until one of the other conditions are met
-      reverse();
-
-        //Cases included
-          //
-
-    }
-
         //conditions for going straight
     if(IRrf == 0 && IRlf == 0 && IRrb == 1 && IRlb == 1){
       while(IRrf == 0 && IRlf == 0 && IRrb == 1 && IRlb == 1){// || (IRrf == 0 && IRlb == 0) || (IRlf == 0 && IRrb == 0) ) { || (IRlf == 0 && IRrb == 0) ){ 
@@ -218,10 +252,107 @@ void loop() {
 
       stop();
     }
+
+    //conditions for right turn
+      //small turn
+      if(IRrf == 1 && IRlf == 0 && IRrb == 1 && IRlb == 1){
+        littleRight();
+
+      } 
+      //medium turn
+      else if((IRrf == 1 && IRlf == 0 && IRrb == 1 && IRlb == 0)){
+        mediumRight();
+
+      }
+      //big turn 
+      else if((IRrf == 1 && IRlf == 0 && IRrb == 0 && IRlb == 0)){
+        bigRight();
+
+      }
+    
+    /*if((IRrb == 1) || (IRrf == 1 && IRrb == 1) ){ //posibly come bck to optimize
+
+      if(IRlf == 0 && IRlb == 0){
+        bigRight();
+      }
+      else if (IR)
+      else{
+        bigRight();
+      }
       
 
+    }*/
+
+    //conditions for left turn
+      else if(IRrf == 0 && IRlf == 1 && IRrb == 1 && IRlb == 1){
+        littleLeft();
+
+      } 
+      //medium turn
+      else if((IRrf == 0 && IRlf == 1 && IRrb == 0 && IRlb == 1)){
+        mediumLeft();
+
+      }
+      //big turn 
+      else if((IRrf == 0 && IRlf == 1 && IRrb == 0 && IRlb == 0)){
+        bigLeft();
+
+      }
+
+    /*else if((IRlb == 1) || (IRlb == 1 && IRlf == 1)){
+
+      if(IRlb == 1 && IRlf == 1){
+        littleLeft();
+      }
+      else{
+        bigLeft();
+      }
+    }*/
 
 
+    //conditions for logo/capacitor
+    else if(IRrf == 1 && IRlf == 1 && IRrb == 1 && IRlb == 1){ 
 
+      straight();
+
+    }
+    //conditions for capacitor
+    else if (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) {
+      straight();
+
+    }
+    /*
+    //conditions for end of race
+    else if(IRrf == 1 && IRlf == 1){ //|| (IRrb == 1 && IRlb == 1)){
+
+      stop();
+
+    } 
+    else if (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) { //in any other case reverse until one of the other conditions are met
+      reverse();
+
+        //Cases included
+          //
+
+    }
+    */
+
+//end conditions 
+    lightSensor.start();
+    lux = lightSensor.getLux();
+
+    if (lux > 1000 && counter > 350) {
+      lightWent = 1;
+      stop();
+      delay(3000);
+    }
+      
+
+delay(30);
+
+
+  counter++;
+  Serial.print("counter: ");
+  Serial.println(counter);
 
 }
