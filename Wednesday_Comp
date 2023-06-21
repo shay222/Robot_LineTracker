@@ -83,7 +83,7 @@ void littleRight(){
   RB_MOTOR->run(BACKWARD);
   LB_MOTOR->run(FORWARD);
   RB_MOTOR->setSpeed(200);
-  LB_MOTOR->setSpeed(0);
+  LB_MOTOR->setSpeed(100);
 
 
 }
@@ -131,7 +131,7 @@ void littleLeft(){
 
   RB_MOTOR->run(FORWARD);
   LB_MOTOR->run(BACWARD);
-  RB_MOTOR->setSpeed(0);
+  RB_MOTOR->setSpeed(100);
   LB_MOTOR->setSpeed(200);
 }
 
