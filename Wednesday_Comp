@@ -38,14 +38,14 @@ int counter = 0;
 void bigRight(){
 
   RF_MOTOR->setSpeed(0);
-  LF_MOTOR->setSpeed(255);
-  RF_MOTOR->run(RELEASE);
+  LF_MOTOR->setSpeed(200);
+  RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(FORWARD);
 
-  RB_MOTOR->setSpeed(50);
-  LB_MOTOR->setSpeed(100);
-  RB_MOTOR->run(BACKWARD);
-  LB_MOTOR->run(FORWARD);
+  RB_MOTOR->setSpeed(15);
+  LB_MOTOR->setSpeed(200);
+  RB_MOTOR->run(FORWARD);
+  LB_MOTOR->run(BACKWARD);
 
 }
 
@@ -53,7 +53,7 @@ void mediumRight(){
 
   RF_MOTOR->setSpeed(0);
   LF_MOTOR->setSpeed(220);
-  RF_MOTOR->run(RELEASE);
+  RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(FORWARD);
 
   RB_MOTOR->setSpeed(40);
@@ -67,12 +67,12 @@ void mediumRight(){
 void littleRight(){
 
   RF_MOTOR->setSpeed(0);
-  LF_MOTOR->setSpeed(200);
-  RF_MOTOR->run(RELEASE);
+  LF_MOTOR->setSpeed(120);
+  RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(FORWARD);
 
-  RB_MOTOR->setSpeed(10);
-  LB_MOTOR->setSpeed(200);
+  RB_MOTOR->setSpeed(30);
+  LB_MOTOR->setSpeed(100);
   RB_MOTOR->run(BACKWARD);
   LB_MOTOR->run(FORWARD);
 
@@ -106,26 +106,26 @@ void mediumLeft(){
 }
 
 void littleLeft(){
-  RF_MOTOR->setSpeed(200);
+  RF_MOTOR->setSpeed(120);
   LF_MOTOR->setSpeed(0);
   RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(RELEASE);
 
-  RB_MOTOR->setSpeed(200);
-  LB_MOTOR->setSpeed(10);
+  RB_MOTOR->setSpeed(100);
+  LB_MOTOR->setSpeed(60);
   RB_MOTOR->run(FORWARD);
   LB_MOTOR->run(BACKWARD);
 }
 
 void straight(){
 
-  RF_MOTOR->setSpeed(200);
-  LF_MOTOR->setSpeed(200);
+  RF_MOTOR->setSpeed(100);
+  LF_MOTOR->setSpeed(100);
   RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(FORWARD);
 
-  RB_MOTOR->setSpeed(230);
-  LB_MOTOR->setSpeed(230);
+  RB_MOTOR->setSpeed(100);
+  LB_MOTOR->setSpeed(100);
   RB_MOTOR->run(FORWARD);
   LB_MOTOR->run(FORWARD);
 
@@ -200,13 +200,14 @@ void loop() {
       lightWent = 0;
       break;
     }
+        Serial.print("Lux:");
+    Serial.println(lux);
+    //Serial.print("small loop");
+    //Serial.println(lightWent);
   }
 
     /*
-    //Serial.print("Lux:");
-    //Serial.println(lux);
-    //Serial.print("small loop");
-    //Serial.println(lightWent);
+
 
   }
 
@@ -214,12 +215,13 @@ void loop() {
 
 
   lightWent = 0;
+  //lux = 0;
   
   Serial.print("big loop");
   Serial.println(lightWent);
 
- // Serial.print("Lux:");
- // Serial.println(lux);
+// Serial.print("Lux:");
+  //Serial.println(lux);
 
 /*
   Serial.print("RF: ");
@@ -240,7 +242,7 @@ void loop() {
 
         //conditions for going straight
     if(IRrf == 0 && IRlf == 0 && IRrb == 1 && IRlb == 1){
-      while(IRrf == 0 && IRlf == 0 && IRrb == 1 && IRlb == 1){// || (IRrf == 0 && IRlb == 0) || (IRlf == 0 && IRrb == 0) ) { || (IRlf == 0 && IRrb == 0) ){ 
+      //while(IRrf == 0 && IRlf == 0 && IRrb == 1 && IRlb == 1){// || (IRrf == 0 && IRlb == 0) || (IRlf == 0 && IRrb == 0) ) { || (IRlf == 0 && IRrb == 0) ){ 
 
         straight();
 
@@ -248,27 +250,45 @@ void loop() {
         IRlf = digitalRead(IR_PLF);
         IRrb = digitalRead(IR_PRB);   
         IRlb = digitalRead(IR_PLB);
-      }
+      //}
 
-      stop();
+      //stop();
     }
 
     //conditions for right turn
       //small turn
-      if(IRrf == 1 && IRlf == 0 && IRrb == 1 && IRlb == 1){
+      if(IRrf == 1 && IRrb == 1 && IRlb == 1 && IRlf == 0){ //|| (IRrf == 0 && IRrb == 1 && IRlb == 0 && IRlf == 0)){
         littleRight();
+        IRrf = digitalRead(IR_PRF);
+        IRlf = digitalRead(IR_PLF);
+        IRrb = digitalRead(IR_PRB);   
+        IRlb = digitalRead(IR_PLB);
 
       } 
+      
       //medium turn
-      else if((IRrf == 1 && IRlf == 0 && IRrb == 1 && IRlb == 0)){
-        mediumRight();
+      if((IRrf == 1 && IRrb == 1 && IRlb == 0 && IRlf == 0)){
+        littleRight();
+        //mediumRight();
+
+        IRrf = digitalRead(IR_PRF);
+        IRlf = digitalRead(IR_PLF);
+        IRrb = digitalRead(IR_PRB);   
+        IRlb = digitalRead(IR_PLB);
 
       }
       //big turn 
-      else if((IRrf == 1 && IRlf == 0 && IRrb == 0 && IRlb == 0)){
+      if((IRrf == 1 && IRrb == 0 && IRlb == 0 && IRlf == 0)){
+        
+        //littleRight();
         bigRight();
+        IRrf = digitalRead(IR_PRF);
+        IRlf = digitalRead(IR_PLF);
+        IRrb = digitalRead(IR_PRB);   
+        IRlb = digitalRead(IR_PLB);
 
       }
+      
     
     /*if((IRrb == 1) || (IRrf == 1 && IRrb == 1) ){ //posibly come bck to optimize
 
@@ -284,20 +304,37 @@ void loop() {
     }*/
 
     //conditions for left turn
-      else if(IRrf == 0 && IRlf == 1 && IRrb == 1 && IRlb == 1){
+      if((IRrf == 0 && IRrb == 1 && IRlb == 1 && IRlf == 1) || (IRrf == 0 && IRrb == 0 && IRlb == 1 && IRlf == 0)){
         littleLeft();
+        IRrf = digitalRead(IR_PRF);
+        IRlf = digitalRead(IR_PLF);
+        IRrb = digitalRead(IR_PRB);   
+        IRlb = digitalRead(IR_PLB);
 
       } 
+      
       //medium turn
-      else if((IRrf == 0 && IRlf == 1 && IRrb == 0 && IRlb == 1)){
-        mediumLeft();
+      if((IRrf == 0 && IRrb == 0 && IRlb == 1  && IRlf == 1)){
+        
+        littleLeft();
+        //mediumLeft();
+        IRrf = digitalRead(IR_PRF);
+        IRlf = digitalRead(IR_PLF);
+        IRrb = digitalRead(IR_PRB);   
+        IRlb = digitalRead(IR_PLB);
 
       }
       //big turn 
-      else if((IRrf == 0 && IRlf == 1 && IRrb == 0 && IRlb == 0)){
-        bigLeft();
+      if((IRrf == 0 && IRrb == 0 && IRlb == 0 && IRlf == 1)){
+        littleLeft();
+        //bigLeft();
+        IRrf = digitalRead(IR_PRF);
+        IRlf = digitalRead(IR_PLF);
+        IRrb = digitalRead(IR_PRB);   
+        IRlb = digitalRead(IR_PLB);
 
       }
+      
 
     /*else if((IRlb == 1) || (IRlb == 1 && IRlf == 1)){
 
@@ -311,14 +348,22 @@ void loop() {
 
 
     //conditions for logo/capacitor
-    else if(IRrf == 1 && IRlf == 1 && IRrb == 1 && IRlb == 1){ 
+    while (IRrf == 1 && IRlf == 1 && IRrb == 1 && IRlb == 1){ 
 
       straight();
+      IRrf = digitalRead(IR_PRF);
+      IRlf = digitalRead(IR_PLF);
+      IRrb = digitalRead(IR_PRB);   
+      IRlb = digitalRead(IR_PLB);
 
     }
     //conditions for capacitor
-    else if (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) {
+    while (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) {
       straight();
+      IRrf = digitalRead(IR_PRF);
+        IRlf = digitalRead(IR_PLF);
+        IRrb = digitalRead(IR_PRB);   
+        IRlb = digitalRead(IR_PLB);
 
     }
     /*
@@ -338,17 +383,27 @@ void loop() {
     */
 
 //end conditions 
-    lightSensor.start();
-    lux = lightSensor.getLux();
+    Serial.println("Reaches lux");
+    
 
-    if (lux > 1000 && counter > 350) {
-      lightWent = 1;
-      stop();
+    Serial.print("The lux is ");
+    Serial.println(lightSensor.getLux());
+    
+    Serial.print("Lux:");
+    Serial.println(lux);
+
+    if (counter > 35) {
+      lightSensor.start();
+      lux = lightSensor.getLux();
+      if(lux>2000){
+        lightWent = 1;
+        stop();
+      }
       delay(3000);
     }
       
 
-delay(30);
+delay(20);
 
 
   counter++;
