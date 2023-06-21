@@ -366,7 +366,7 @@ void loop() {
 
 
     //conditions for logo/capacitor
-    while (IRrf == 1 && IRlf == 1 && IRrb == 1 && IRlb == 1){ 
+    if (IRrf == 1 && IRlf == 1 && IRrb == 1 && IRlb == 1){ 
 
       straight();
       IRrf = digitalRead(IR_PRF);
@@ -376,7 +376,7 @@ void loop() {
 
     }
     //conditions for capacitor
-    while (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) {
+    if (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) {
       straight();
       IRrf = digitalRead(IR_PRF);
         IRlf = digitalRead(IR_PLF);
@@ -421,7 +421,7 @@ void loop() {
     }
       
 
-delay(20);
+//delay(20);
 
 
   counter++;
