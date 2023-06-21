@@ -417,7 +417,7 @@ void loop() {
         lightWent = 1;
         stop();
       }
-      delay(3000);
+      //delay(3000);
     }
       
 
