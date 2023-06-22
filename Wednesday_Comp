@@ -36,16 +36,16 @@ int counter = 0;
 
 //FUNCTIONS
 void bigRight(){
-
-  RF_MOTOR->setSpeed(0);
-  LF_MOTOR->setSpeed(200);
   RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(FORWARD);
+  RF_MOTOR->setSpeed(0);
+  LF_MOTOR->setSpeed(200);
 
-  RB_MOTOR->setSpeed(15);
-  LB_MOTOR->setSpeed(200);
-  RB_MOTOR->run(FORWARD);
-  LB_MOTOR->run(BACKWARD);
+  RB_MOTOR->run(BACKWARD);
+  LB_MOTOR->run(FORWARD);
+  RB_MOTOR->setSpeed(200);
+  LB_MOTOR->setSpeed(0);
+
 
 }
 
@@ -66,15 +66,24 @@ void mediumRight(){
 
 void littleRight(){
 
-  RF_MOTOR->setSpeed(0);
-  LF_MOTOR->setSpeed(120);
+  // RF_MOTOR->setSpeed(0);
+  // LF_MOTOR->setSpeed(120);
+  // RF_MOTOR->run(FORWARD);
+  // LF_MOTOR->run(FORWARD);
+
+  // RB_MOTOR->setSpeed(30);
+  // LB_MOTOR->setSpeed(100);
+  // RB_MOTOR->run(BACKWARD);
+  // LB_MOTOR->run(FORWARD);
   RF_MOTOR->run(FORWARD);
   LF_MOTOR->run(FORWARD);
+  RF_MOTOR->setSpeed(0);
+  LF_MOTOR->setSpeed(200);
 
-  RB_MOTOR->setSpeed(30);
-  LB_MOTOR->setSpeed(100);
   RB_MOTOR->run(BACKWARD);
   LB_MOTOR->run(FORWARD);
+  RB_MOTOR->setSpeed(200);
+  LB_MOTOR->setSpeed(100);
 
 
 }
@@ -106,15 +115,24 @@ void mediumLeft(){
 }
 
 void littleLeft(){
-  RF_MOTOR->setSpeed(120);
-  LF_MOTOR->setSpeed(0);
-  RF_MOTOR->run(FORWARD);
-  LF_MOTOR->run(RELEASE);
+  // RF_MOTOR->setSpeed(120);
+  // LF_MOTOR->setSpeed(0);
+  // RF_MOTOR->run(FORWARD);
+  // LF_MOTOR->run(RELEASE);
 
-  RB_MOTOR->setSpeed(100);
-  LB_MOTOR->setSpeed(60);
+  // RB_MOTOR->setSpeed(100);
+  // LB_MOTOR->setSpeed(60);
+  // RB_MOTOR->run(FORWARD);
+  // LB_MOTOR->run(BACKWARD);
+  RF_MOTOR->run(FORWARD);
+  LF_MOTOR->run(FORWARD);
+  RF_MOTOR->setSpeed(200);
+  LF_MOTOR->setSpeed(0);
+
   RB_MOTOR->run(FORWARD);
-  LB_MOTOR->run(BACKWARD);
+  LB_MOTOR->run(BACWARD);
+  RB_MOTOR->setSpeed(100);
+  LB_MOTOR->setSpeed(200);
 }
 
 void straight(){
@@ -281,7 +299,7 @@ void loop() {
       if((IRrf == 1 && IRrb == 0 && IRlb == 0 && IRlf == 0)){
         
         //littleRight();
-        bigRight();
+        littleRight();
         IRrf = digitalRead(IR_PRF);
         IRlf = digitalRead(IR_PLF);
         IRrb = digitalRead(IR_PRB);   
@@ -348,7 +366,7 @@ void loop() {
 
 
     //conditions for logo/capacitor
-    while (IRrf == 1 && IRlf == 1 && IRrb == 1 && IRlb == 1){ 
+    if (IRrf == 1 && IRlf == 1 && IRrb == 1 && IRlb == 1){ 
 
       straight();
       IRrf = digitalRead(IR_PRF);
@@ -358,7 +376,7 @@ void loop() {
 
     }
     //conditions for capacitor
-    while (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) {
+    if (IRrf == 0 && IRlf == 0 && IRrb == 0 && IRlb == 0) {
       straight();
       IRrf = digitalRead(IR_PRF);
         IRlf = digitalRead(IR_PLF);
@@ -399,11 +417,11 @@ void loop() {
         lightWent = 1;
         stop();
       }
-      delay(3000);
+      //delay(3000);
     }
       
 
-delay(20);
+//delay(20);
 
 
   counter++;
